@@ -72,7 +72,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     registerUser(update.getMessage());
                     break;
                 case "/info":
-                    infoUser(update.getMessage());
+                    infoUser(chatId);
                     break;
                 case "/git":
                     gitLink(update.getMessage().getChatId());
@@ -92,7 +92,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 mainMessage(chatId);
             }
             if (callBackData.equals("ACCOUNT_BUTTON")) {
-                infoUser(update.getMessage());
+                infoUser(chatId);
             }
             if (callBackData.equals("HELP_BUTTON")){
                 helpMessage(chatId);
@@ -163,11 +163,11 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.error("пользователь уже существует " + userRepository.findById(message.getChatId()));
     }
 
-    private void infoUser(Message message) {
-        Optional<User> userOptional = userRepository.findById(message.getChatId());
+    private void infoUser(long chatId) {
+        Optional<User> userOptional = userRepository.findById(chatId);
         if (userOptional.isPresent()) {
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(String.valueOf(message.getChatId()));
+            sendMessage.setChatId(String.valueOf(chatId));
             User user = userOptional.get();
             String answer = "Информация о вас\n\n" +
                     "Ваш ID: " + user.getId() + "\n" +
@@ -268,16 +268,21 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.error("error " + e.getMessage());
         }
     }
+
+    public void mainRepositoryMessage(long chatId){
+        String answer = "\uD83D\uDCC2 Выберите один из репозиториев:";
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(chatId));
+        sendMessage.setText(answer);
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsLine1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowLine1 = new ArrayList<>();
+
+        List<List<InlineKeyboardButton>> rowsLine2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowLine2 = new ArrayList<>();
+
+        List<List<InlineKeyboardButton>> rowsLine3 = new ArrayList<>();
+        List<InlineKeyboardButton> rowLine3 = new ArrayList<>();
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
