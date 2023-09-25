@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:12.6-alpine
+    volumes:
+      - .volumes/pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  application:
+    build: .
+    container_name: users
+    environment:
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/postgres
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    restart: always
