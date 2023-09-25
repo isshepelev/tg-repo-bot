@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.isshepelev.tgrepository.config.BotConfig;
-import ru.isshepelev.tgrepository.constant.Const;
+
 import ru.isshepelev.tgrepository.entity.User;
 import ru.isshepelev.tgrepository.repository.UserRepository;
 
@@ -173,7 +173,10 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     public void startCommand(long chatId, String name) {
-        String answer = "Доброго времени суток, " + name + ",\n" + Const.START_MESSAGE_TEXT;
+        String answer = "Доброго времени суток, " + name + ",\n" + "\uD83E\uDD16 Добро пожаловать в мир моих проек"+
+                "тов, где искусство кодирования и инноваций сочетается с удобством и доступностью. Этот бот создан,"+
+                " чтобы предоставить вам уникальную возможность ознакомиться с моими проектами, не покидая платформу"+
+                " Telegram.";
         sendMessage(chatId, answer);
 
     }
@@ -200,10 +203,10 @@ public class TelegramBot extends TelegramLongPollingBot {
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(chatId));
             User user = userOptional.get();
-            String answer = "Информация о вас\n\n" +
-                    "Ваш ID: " + user.getId() + "\n" +
-                    "Имя: " + user.getFirstname() + "\n" +
-                    "Дата регистарции: " + user.getDate();
+            String answer = "\uD83E\uDDD0 Для тех, кто любит раскрывать секреты, вот немного сведений о вас:\n\n" +
+                    "\uD83D\uDCBC ID: " + user.getId() + "\n" +
+                    "\uD83E\uDD16 Имя: " + user.getFirstname() + "\n" +
+                    "\uD83D\uDCC6 Дата регистрации: " + user.getDate();
             sendMessage.setText(answer);
 
             InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
@@ -230,7 +233,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void mainMessage(long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText("Основные возможности бота:");
+        sendMessage.setText("\uD83C\uDF1F Основные фишки бота:");
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsLine = new ArrayList<>();
@@ -273,8 +276,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         String answer = "Добро пожаловать в помощь! Вы можете использовать следующие команды:\n" +
                 "\n" +
                 "\uD83D\uDC64 /info - Просмотр информации о вашем профиле.\n" +
-                "\uD83D\uDCC2 /project - Просмотр списка ваших проектов и их описаний.\n" +
-                "\uD83C\uDF10 /git - Ссылка на ваш аккаунт на GitHub.\n" +
+                "\uD83D\uDCC2 /project - Просмотр списка моих проектов и их описаний.\n" +
+                "\uD83C\uDF10 /git - Ссылка на мой аккаунт на GitHub.\n" +
                 "\uD83D\uDE80 /start - Запустить бота.";
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(answer);
@@ -286,6 +289,31 @@ public class TelegramBot extends TelegramLongPollingBot {
         var back = new InlineKeyboardButton();
         back.setText("Назад!");
         back.setCallbackData("BACK_FOR_MAIN_MESSAGE");
+
+        rowLine.add(back);
+        rowsLine.add(rowLine);
+
+        markup.setKeyboard(rowsLine);
+        sendMessage.setReplyMarkup(markup);
+
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            log.error("error " + e.getMessage());
+        }
+    }
+    public void buttonBackRepo(long chatId, String text){
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setText(text);
+        sendMessage.setChatId(String.valueOf(chatId));
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowLine = new ArrayList<>();
+
+        var back = new InlineKeyboardButton();
+        back.setText("Вернуться к репозиторию");
+        back.setCallbackData("BACK_FOR_REPO_MESSAGE");
 
         rowLine.add(back);
         rowsLine.add(rowLine);
@@ -418,84 +446,20 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
     public void sshCarSalonApi(long chatId){
-        SendMessage sendMessage = new SendMessage();
         String text = "ssh: \n" + "git@github.com:isshepelev/car-salon-api.git";
-        sendMessage.setText(text);
-        sendMessage.setChatId(String.valueOf(chatId));
-
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsLine = new ArrayList<>();
-        List<InlineKeyboardButton> rowLine = new ArrayList<>();
-
-        var back = new InlineKeyboardButton();
-        back.setText("Вернуться к репозиторию");
-        back.setCallbackData("BACK_FOR_REPO_MESSAGE");
-
-        rowLine.add(back);
-        rowsLine.add(rowLine);
-
-        markup.setKeyboard(rowsLine);
-        sendMessage.setReplyMarkup(markup);
-
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            log.error("error " + e.getMessage());
-        }
+        buttonBackRepo(chatId, text);
     }
 
     public void httpCarSalonApi(long chatId){
-        SendMessage sendMessage = new SendMessage();
         String text = "http: \n" + "https://github.com/isshepelev/car-salon-api.git";
-        sendMessage.setText(text);
-        sendMessage.setChatId(String.valueOf(chatId));
-
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsLine = new ArrayList<>();
-        List<InlineKeyboardButton> rowLine = new ArrayList<>();
-
-        var back = new InlineKeyboardButton();
-        back.setText("Вернуться к репозиторию");
-        back.setCallbackData("BACK_FOR_REPO_MESSAGE");
-
-        rowLine.add(back);
-        rowsLine.add(rowLine);
-
-        markup.setKeyboard(rowsLine);
-        sendMessage.setReplyMarkup(markup);
-
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            log.error("error " + e.getMessage());
-        }
+        buttonBackRepo(chatId,text);
     }
     public void infoCarSalonApi(long chatId){
-        SendMessage sendMessage = new SendMessage();
         String text = "\uD83D\uDE43 Ой-ой, кажется, тут должно было быть описание к проекту, но мне было лень его делать. \uD83D\uDE05\n" +
                 "\n" +
                 "Если вам действительно интересно, о чем этот проект, то, не стесняйтесь спрашивать.\uD83E\uDD70";
-        sendMessage.setText(text);
-        sendMessage.setChatId(String.valueOf(chatId));
-
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsLine = new ArrayList<>();
-        List<InlineKeyboardButton> rowLine = new ArrayList<>();
-
-        var back = new InlineKeyboardButton();
-        back.setText("Вернуться к репозиторию");
-        back.setCallbackData("BACK_FOR_REPO_MESSAGE");
-
-        rowLine.add(back);
-        rowsLine.add(rowLine);
-
-        markup.setKeyboard(rowsLine);
-        sendMessage.setReplyMarkup(markup);
-
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            log.error("error " + e.getMessage());
-        }
+       buttonBackRepo(chatId,text);
     }
+
+
 }
