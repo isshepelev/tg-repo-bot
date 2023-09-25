@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/tgrepobot
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+bot:
+  token: your token
+  name: your name bot
+
