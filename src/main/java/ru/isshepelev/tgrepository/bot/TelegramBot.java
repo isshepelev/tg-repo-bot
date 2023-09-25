@@ -27,15 +27,16 @@ import java.util.Optional;
 @Slf4j
 public class TelegramBot extends TelegramLongPollingBot {
     private final UserRepository userRepository;
-    BotConfig botConfig = new BotConfig();
+    private final BotConfig botConfig;
 
     public TelegramBot(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.botConfig = new BotConfig();
         List<BotCommand> listCommands = new ArrayList();
         listCommands.add(new BotCommand("/start", "start bot"));
-        listCommands.add(new BotCommand("/reg", "registration"));
         listCommands.add(new BotCommand("/info", "information about you"));
+        listCommands.add(new BotCommand("/project", "my repository"));
+        listCommands.add(new BotCommand("/git", "my git repository (link)"));
 
 
         try {
@@ -73,22 +74,57 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "/info":
                     infoUser(update.getMessage());
                     break;
-
+                case "/git":
+                    gitLink(update.getMessage().getChatId());
+                    break;
+                case "/help":
+                    helpMessage(update.getMessage().getChatId());
+                    break;
                 default:
                     sendMessage(chatId, "Извините, неизветсная команда!");
                     break;
             }
-        }else if (update.hasCallbackQuery()){
+        } else if (update.hasCallbackQuery()) {
             String callBackData = update.getCallbackQuery().getData();
-            long messageId = update.getCallbackQuery().getMessage().getMessageId();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-            if (callBackData.equals("BACK_FOR_MAIN_MESSAGE")){
+            if (callBackData.equals("BACK_FOR_MAIN_MESSAGE")) {
                 mainMessage(chatId);
             }
-            if (callBackData.equals("ACCOUNT_BUTTON")){
+            if (callBackData.equals("ACCOUNT_BUTTON")) {
                 infoUser(update.getMessage());
             }
+            if (callBackData.equals("HELP_BUTTON")){
+                helpMessage(chatId);
+            }
+
+
+        }
+    }
+
+    private void gitLink(Long chatId) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(chatId));
+        sendMessage.setText("Мой github");
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowLine = new ArrayList<>();
+        var gitLink = new InlineKeyboardButton();
+        gitLink.setText("Заглянуть!");
+        gitLink.setCallbackData("GIT_LINK_BUTTON");
+        gitLink.setUrl("https://github.com/isshepelev");
+
+        rowLine.add(gitLink);
+        rowsLine.add(rowLine);
+
+        markup.setKeyboard(rowsLine);
+        sendMessage.setReplyMarkup(markup);
+
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            log.error("error " + e.getMessage());
         }
     }
 
@@ -200,7 +236,37 @@ public class TelegramBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             log.error("error " + e.getMessage());
         }
+    }
 
+    private void helpMessage(long chatId){
+        String answer = "Добро пожаловать в помощь! Вы можете использовать следующие команды:\n" +
+                "\n" +
+                "\uD83D\uDC64 /info - Просмотр информации о вашем профиле.\n" +
+                "\uD83D\uDCC2 /project - Просмотр списка ваших проектов и их описаний.\n" +
+                "\uD83C\uDF10 /git - Ссылка на ваш аккаунт на GitHub.\n" +
+                "\uD83D\uDE80 /start - Запустить бота.";
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setText(answer);
+        sendMessage.setChatId(String.valueOf(chatId));
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowLine = new ArrayList<>();
+        var back = new InlineKeyboardButton();
+        back.setText("Назад!");
+        back.setCallbackData("BACK_FOR_MAIN_MESSAGE");
+
+        rowLine.add(back);
+        rowsLine.add(rowLine);
+
+        markup.setKeyboard(rowsLine);
+        sendMessage.setReplyMarkup(markup);
+
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            log.error("error " + e.getMessage());
+        }
     }
 }
 
